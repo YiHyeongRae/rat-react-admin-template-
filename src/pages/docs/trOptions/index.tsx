@@ -6,6 +6,7 @@ import trOptionsCode from "#/data/codes/table/trOptions.txt";
 import { useLoadingContext } from "#/utils/useLoadingContext";
 import Table from "#/components/Table";
 import { TdObjTypes } from "#/data/types/components";
+import { map } from "lodash";
 function index() {
   const addedMap = [
     ["id", "id"],
@@ -23,6 +24,19 @@ function index() {
     pageLength: 1,
   });
 
+  function getRandomHexColor() {
+    return Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0");
+  }
+
+  function getRandomPlaceholdUrls() {
+    const color1 = getRandomHexColor();
+    const color2 = getRandomHexColor();
+    const url1 = `https://placehold.co/150x150/${color1}/${color2}.png`;
+    const url2 = `https://placehold.co/600x600/${color1}/${color2}.png`;
+    return { url1, url2 };
+  }
   const [isExpand, setIsExpand] = useState(false);
   const { t } = useTranslation();
   const { showLoading, hideLoading } = useLoadingContext();
@@ -33,7 +47,12 @@ function index() {
       `https://jsonplaceholder.typicode.com/photos?_page=${perPage.page}&_limit=${perPage.perPage}`
     ).then(async (res) => {
       const result = await res.json();
+      map(result, (item) => {
+        const { url1, url2 } = getRandomPlaceholdUrls();
 
+        item.thumbnailUrl = url1;
+        item.url = url2;
+      });
       setData(result);
 
       setPerPage((prev) => {
